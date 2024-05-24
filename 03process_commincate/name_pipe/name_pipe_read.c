@@ -15,6 +15,7 @@ int main(void){
     int fd;
     uint8_t buff[50];
 
+    // 打开管道
     if((fd=open("fifo", O_RDONLY)) < 0 ){
         perror("pipe open error");
         exit(-1);

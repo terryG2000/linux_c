@@ -12,12 +12,13 @@
 
 int main(void){
     int fd;
-
+    // 创建管道 在当前工作目录  权限所有人都能读写
     if(mkfifo("fifo",0666)){
         perror("pipe create error");
         exit(-1);
     }
 
+    // 打开 管道
     if((fd=open("fifo", O_WRONLY)) < 0 ){
         perror("pipe open error");
         exit(-1);

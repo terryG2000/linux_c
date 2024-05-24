@@ -26,7 +26,7 @@ int main(void){
     struct msg_frame msg;
     int ret;
 
-    printf("start \n");
+    printf("rev start \n");
     // 根据已有文件 生成一个 唯一的key 作为 队列的唯一标识
     if( (key = ftok(MSG_FILE,0)) < 0){
         perror("ftok error");
@@ -34,23 +34,20 @@ int main(void){
     }
     printf("Message Queue Key : %d", key);
 
-    // IPC_CREAT 标志创建队列    0666 表示三位8 进制的权限
-    if( (msqid = msgget(key, IPC_CREAT|0666)) == -1){
+    // IPC_CREAT 标志没有队列时 创建队列    0666 表示三位8 进制的权限
+    if( (msqid = msgget(key, 0666)) == -1){
         perror("msg get error");
         exit(-1);
     }
 
     printf("msq id %d,pid %d", msqid, getpid());
 
-    while(1){
-        msg.msg_type = 888;
-        msg.msg[0] = 'a';
-        msg.msg[1] = 'b';
 
-        ret = msgsnd(msqid, &msg, 2, 0);
-        if(!ret){
-            printf("sending msg %c - %c\n", msg.msg[0], msg.msg[1]);
-        }
+    while(1){
         sleep(1);
+        ret = msgrcv(msqid, &msg, 2, 888, 0);
+        printf("get msg %c - %c\n", msg.msg[0], msg.msg[1]);
     }
+
+
 }

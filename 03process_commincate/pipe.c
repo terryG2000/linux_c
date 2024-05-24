@@ -13,6 +13,8 @@ int main(void){
     int fd[2] = {0};
     u_int8_t buff[50];
 
+    // 创建 无名管道
+    // 返回两个 文件描述符 【0】是可读 [1]可写
     if(pipe(fd) < 0){
         perror("pipe create error");
         exit(-1);
