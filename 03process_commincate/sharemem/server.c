@@ -91,7 +91,7 @@ int main(void){
     int shm_id,sem_id,msq_id;
     char *shm;
     char data[] = "this is server";
-    struct shmid_ds shmds;
+    struct shmid_ds shmds; // 用于删除共享内存
     struct msqid_ds msqds; // 用于删除消息队列
     struct msg_frame msg;
 
@@ -100,36 +100,40 @@ int main(void){
         exit(-1);
     }
 
+    //创建共享内存
     if( (shm_id = shmget(key, 1024, IPC_CREAT|0666)) == -1){
         error("shmget error");
         exit(-1);
     }
+    shm = (char*) shmat(shm_id, 0, 0);// 连接共享内存
 
-    shm = (char*) shmat(shm_id, 0, 0);
-
+    // 获取消息队列
     if( (msq_id = msgget(key, IPC_CREAT|0666)) == -1){
         error("msgget error");
         exit(-1);
     }
-
+    //创建信号量
     sem_id = create_sem(key);
 
     while(1){
+        // 通过消息队列接收 共享内存中是否已写入
         msgrcv(msq_id, &msg, 1, 888, 0);
         if(msg.text == 'q')
             break;
         else if(msg.text == 'r'){
+            // 通过信号量 控制共享内存的访问
             sem_p(sem_id);
             printf("%s \n", shm);
             sem_v(sem_id);
         }
     }
 
+    //断开共享内存连接
     shmdt(shm);
 
-    shmctl(shm_id, IPC_RMID, &shmds);
-    msgctl(msq_id, IPC_RMID, &msqds);
-    del_sem(sem_id);
+    shmctl(shm_id, IPC_RMID, &shmds); // 删除共享内存
+    msgctl(msq_id, IPC_RMID, &msqds);// 删除消息队列
+    del_sem(sem_id);// 删除信号量
 
     exit(0);
 }

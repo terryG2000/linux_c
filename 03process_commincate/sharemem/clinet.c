@@ -89,10 +89,10 @@ int main(void){
         printf("input command: ");
         scanf("%c", &c);
         switch (c) {
-            case 'r':
+            case 'r': // command r 写入共享内存
                 printf("send data:");
-                sem_p(sem_id);
-                scanf("%s",shm);
+                sem_p(sem_id);// 获取资源
+                scanf("%s",shm);// 写入共享内存
                 sem_v(sem_id);
                 // 当scanf()输入字符或字符串时，缓冲区中遗留下了\n，所以每次输入操作后都需要清空标准输入的缓冲区。
                 while( (c = getchar()) != '\n' && c != EOF);
@@ -103,7 +103,7 @@ int main(void){
             case 'q':
 
                 msg.mtype = 888;
-                msg.text = 'q';
+                msg.text = 'q'; // 发送退出消息 然服务端删除共享内存、信号量和消息队列
                 msgsnd(msq_id, &msg, sizeof(msg.text), 0);
                 flag = 0;
                 break;
